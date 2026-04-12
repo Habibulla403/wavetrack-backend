@@ -4,6 +4,24 @@ import { protect } from "../middleware/auth.js";
 
 const router = express.Router();
 
+// Plan upload limit check middleware
+const checkUploadLimit = async (req, res, next) => {
+  try {
+    const limits = req.user.getPlanLimits();
+    if (limits.maxSongs === Infinity) return next();
+    const count = await Song.countDocuments({ user: req.user._id });
+    if (count >= limits.maxSongs) {
+      return res.status(403).json({
+        message: `Your ${limits.label} plan allows up to ${limits.maxSongs} songs. Please upgrade to upload more.`,
+        upgradeRequired: true,
+      });
+    }
+    next();
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 router.get("/", protect, async (req, res) => {
   try {
     const songs = await Song.find({ user: req.user._id }).sort({ createdAt: -1 });
@@ -13,7 +31,7 @@ router.get("/", protect, async (req, res) => {
   }
 });
 
-router.post("/", protect, async (req, res) => {
+router.post("/", protect, checkUploadLimit, async (req, res) => {
   try {
     const { title, genre, coverUrl, audioUrl } = req.body;
     if (!title) return res.status(400).json({ message: "Title required" });
@@ -53,13 +71,19 @@ router.delete("/:id", protect, async (req, res) => {
 router.get("/stats", protect, async (req, res) => {
   try {
     const songs = await Song.find({ user: req.user._id });
-    const totalStreams = songs.reduce((a, s) => a + s.streams, 0);
+    const totalStreams  = songs.reduce((a, s) => a + s.streams, 0);
     const totalEarnings = songs.reduce((a, s) => a + s.earnings, 0);
-    const liveSongs = songs.filter(s => s.status === "live").length;
-    res.json({ total: songs.length, totalStreams, totalEarnings, liveSongs });
+    const liveSongs     = songs.filter(s => s.status === "live").length;
+    const limits        = req.user.getPlanLimits();
+    res.json({ total: songs.length, totalStreams, totalEarnings, liveSongs, plan: req.user.plan, limits });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
+});
+
+// GET /api/songs/plan-limits
+router.get("/plan-limits", protect, (req, res) => {
+  res.json({ plan: req.user.plan, limits: req.user.getPlanLimits() });
 });
 
 export default router;
