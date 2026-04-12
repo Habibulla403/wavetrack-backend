@@ -6,6 +6,7 @@ import { v2 as cloudinary } from "cloudinary";
 import authRoutes from "./routes/auth.js";
 import songRoutes from "./routes/songs.js";
 import uploadRoutes from "./routes/upload.js";
+import paymentRoutes from "./routes/payment.js";
 
 dotenv.config();
 
@@ -17,6 +18,8 @@ cloudinary.config({
 
 const app = express();
 
+app.use("/api/payment/webhook", express.raw({ type: "application/json" }));
+
 app.use(cors({ origin: process.env.FRONTEND_URL || "*" }));
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
@@ -25,9 +28,10 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.error("MongoDB error:", err));
 
-app.use("/api/auth", authRoutes);
-app.use("/api/songs", songRoutes);
-app.use("/api/upload", uploadRoutes);
+app.use("/api/auth",    authRoutes);
+app.use("/api/songs",   songRoutes);
+app.use("/api/upload",  uploadRoutes);
+app.use("/api/payment", paymentRoutes);
 
 app.get("/", (req, res) => res.json({ message: "WaveTrack API running" }));
 
