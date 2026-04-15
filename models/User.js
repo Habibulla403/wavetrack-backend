@@ -16,6 +16,20 @@ const userSchema = new mongoose.Schema({
   website:              { type: String, default: "" },
   socialLinks:          { type: Object, default: {} },
   avatarUrl:            { type: String, default: "" },
+  payoutInfo: {
+    method:        { type: String, enum: ["paypal", "bank"], default: null },
+    paypalEmail:   { type: String, default: "" },
+    bankName:      { type: String, default: "" },
+    accountNumber: { type: String, default: "" },
+    accountName:   { type: String, default: "" },
+  },
+  payoutRequests: [{
+    amount:    { type: Number },
+    method:    { type: String },
+    status:    { type: String, enum: ["pending", "paid", "rejected"], default: "pending" },
+    createdAt: { type: Date, default: Date.now },
+    note:      { type: String, default: "" },
+  }],
 }, { timestamps: true });
 
 userSchema.pre("save", async function (next) {
