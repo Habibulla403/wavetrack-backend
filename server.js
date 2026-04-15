@@ -7,6 +7,7 @@ import authRoutes from "./routes/auth.js";
 import songRoutes from "./routes/songs.js";
 import uploadRoutes from "./routes/upload.js";
 import paymentRoutes from "./routes/payment.js";
+import payoutRoutes  from "./routes/payout.js";
 
 dotenv.config();
 
@@ -32,6 +33,7 @@ app.use("/api/auth",    authRoutes);
 app.use("/api/songs",   songRoutes);
 app.use("/api/upload",  uploadRoutes);
 app.use("/api/payment", paymentRoutes);
+app.use("/api/payout",  payoutRoutes);
 
 app.get("/", (req, res) => res.json({ message: "WaveTrack API running" }));
 
