@@ -26,6 +26,7 @@ const userSchema = new mongoose.Schema({
   website:              { type: String, default: "" },
   socialLinks:          { type: Object, default: {} },
   avatarUrl:            { type: String, default: "" },
+  coverUrl:             { type: String, default: "" },
   payoutInfo: {
     method:        { type: String, enum: ["paypal", "bank"], default: null },
     paypalEmail:   { type: String, default: "" },
