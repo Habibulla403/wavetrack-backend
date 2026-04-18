@@ -70,24 +70,25 @@ router.get("/me", protect, async (req, res) => {
 // PUT /api/auth/profile
 router.put("/profile", protect, async (req, res) => {
   try {
-    const { name, bio, location, genre, website, socialLinks, avatarUrl } = req.body;
+    const { name, bio, location, genre, website, socialLinks, avatarUrl, coverUrl } = req.body;
     const user = await User.findById(req.user._id);
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    if (name)                    user.name        = name;
-    if (bio        !== undefined) user.bio        = bio;
-    if (location   !== undefined) user.location   = location;
-    if (genre      !== undefined) user.genre      = genre;
-    if (website    !== undefined) user.website    = website;
+    if (name)                     user.name        = name;
+    if (bio        !== undefined) user.bio         = bio;
+    if (location   !== undefined) user.location    = location;
+    if (genre      !== undefined) user.genre       = genre;
+    if (website    !== undefined) user.website     = website;
     if (socialLinks)              user.socialLinks = socialLinks;
     if (avatarUrl)                user.avatarUrl   = avatarUrl;
+    if (coverUrl   !== undefined) user.coverUrl    = coverUrl;
 
     await user.save();
     res.json({
       _id: user._id, name: user.name, email: user.email, plan: user.plan, role: user.role,
       bio: user.bio, location: user.location, genre: user.genre,
       website: user.website, socialLinks: user.socialLinks,
-      avatarUrl: user.avatarUrl, createdAt: user.createdAt,
+      avatarUrl: user.avatarUrl, coverUrl: user.coverUrl, createdAt: user.createdAt,
     });
   } catch (err) {
     res.status(500).json({ message: err.message });
