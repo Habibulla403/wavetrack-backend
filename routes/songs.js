@@ -35,11 +35,26 @@ router.get("/", protect, async (req, res) => {
 // POST /api/songs — create song
 router.post("/", protect, checkUploadLimit, async (req, res) => {
   try {
-    const { title, genre, coverUrl, audioUrl } = req.body;
+    const {
+      title, genre, secondaryGenre, language, coverUrl, audioUrl,
+      artistName, recordLabel, releaseDate, previouslyReleased,
+      isCover, songwriters, isrc, explicit, isRadioEdit, instrumental,
+      aiGenerated, featuredArtists, versionInfo, selectedPlatforms,
+      spotifyArtistLink, appleMusicArtistLink, instagramLink, facebookLink,
+      addons, trackPrice,
+    } = req.body;
+
     if (!title) return res.status(400).json({ message: "Title required" });
+
     const song = await Song.create({
       user: req.user._id,
-      title, genre, coverUrl, audioUrl, status: "pending",
+      title, genre, secondaryGenre, language, coverUrl, audioUrl,
+      artistName, recordLabel, releaseDate, previouslyReleased,
+      isCover, songwriters, isrc, explicit, isRadioEdit, instrumental,
+      aiGenerated, featuredArtists, versionInfo, selectedPlatforms,
+      spotifyArtistLink, appleMusicArtistLink, instagramLink, facebookLink,
+      addons, trackPrice,
+      status: "pending",
     });
     res.status(201).json(song);
   } catch (err) {
