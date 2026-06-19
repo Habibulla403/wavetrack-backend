@@ -40,4 +40,7 @@ app.use("/api/admin",   adminRoutes);
 app.get("/", (req, res) => res.json({ message: "WaveTrack API running" }));
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+const server = app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// Increase timeout to handle large base64 audio uploads (default Node is 2 mins, but Render's proxy may still cut off ~30-100s on free tier)
+server.timeout = 120000; // 120s
+server.keepAliveTimeout = 120000;
